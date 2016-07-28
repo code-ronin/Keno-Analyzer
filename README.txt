@@ -1,15 +1,27 @@
-This Project is used to study MA Keno and see if it is worth playing and spending money on. Of course the odds will be against you (the house always wins), but I'd like to know some things:
-1) what's the best number of picks to take below 5
+This Project uses Python 3+, Selenium, and Beautiful Soup
+
+DISCLAIMER: This project does not promote Keno gambling of any kind. It is merely a study project.
+
+This Project is used to study MA Keno and see if it is worth playing and spending money on. Of course the odds should be against you, but I'd like to know some things:
+1) what's the best number of picks to take below 5 (I assume anything beyond that takes pure luck or foresight to win)
 2) is there a way to predict some numbers based on the ones already played
 
-Notes on How I gather samples below:
-For my sample testing, what I do is collect data from past keno games and make the assumption that we're buying at draw number 200 on 7-14-2016 data. So you'd buy a ticket for draw 201 that day, up to 230 (30 draws per ticket is the maximum)
+Future Materials:
+1) Automate some data collection to collect a repo of data (Need more HD space)
+2) Create a detailed analysis of the collected data and have it in a more presentable form (charts, tables, stuff like that)
+3) Adjust terminal output to print out appropriate/desired output
 
-For counting wins, I consider it a win if the combination of numbers matches anything for the pick.
+=======================================================
+Below is some very light analysis based on a single days worth of draws..............
+
+For my sample testing, what I do is run my analysis at draw number 200 on 7-14-2016 data. So you'd theoretically have bought a ticket for draw 201 that day, up to 230 (30 draws per ticket is the maximum)
+
+For counting wins, I consider it a win if the combination of numbers matches any prize for the pick.
 
 Matches only to be included if it has a payout
 
 For formatting, it'll look something like this:
+NOTE: Below output is all manually typed in- future stuff is to modify output when I find the time
 
 11/15, (6 m1, 4 m2) 6f, 18g, 2p
 
@@ -77,7 +89,3 @@ Match 4: $100
 >13/30,[(0, 1), (1, 16), (2, 11), (3, 2)],f7,g19,-p11
 
 Getting 4 matches is very good, but unfortunately they do not show up often. You can get matches of of 2's and sometimes 3's, but getting 4's is very improbable. For a bet of 4, you need to get the 4 matches to make any reasonable profit.
-
-
-******/Conclusion/******
-TL;DR - House will always win, but Pick 2 for up to 10 to 20 draws if you want to consistently make something back
