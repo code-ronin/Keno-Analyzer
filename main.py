@@ -23,6 +23,9 @@ kenoFile = getKenoData.parseFile(htmlFile)
 #analyzeKenoData.bestPick1(kenoFile)
 #Run the best pick data for a Pick-N
 analyzeKenoData.bestPickN(kenoFile, 3)
+test ="test"
+yolo = test[::-1]
+print(yolo)
 #For each
 
 #test
