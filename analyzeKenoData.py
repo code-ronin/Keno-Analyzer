@@ -1,4 +1,6 @@
+from __future__ import division
 import re
+import os
 from itertools import islice
 from collections import Counter
 import random
@@ -17,14 +19,16 @@ def numFreq(textFile):
     numCount = []
     for i in range(1, 81):
         numCount.append(numList.count(i))
-    print(numCount)
+    #print(numCount)
     #Total draws Currently:
+    '''
     with open(textFile) as f:
       print ("Total draws: " + str(len(f.readlines())))
     #Hot numbers: Numbers that have not shown up frequently
     print("Hottest Number: " + str(numCount.index(min(numCount))+1))
     #Cold Numbers: Numbers that have appeared most often
     print("Coldest Number: " + str(numCount.index(max(numCount))+1))
+    '''
     #Numbers that have shown up in the last N games
     N = 15  #Number of games that occur within an hour
     with open(textFile) as f:
@@ -39,16 +43,18 @@ def numFreq(textFile):
     hotNumCount = []
     for i in range(1, 81):
         hotNumCount.append(hotNumList.count(i))
-    print(hotNumCount)
+    #print(hotNumCount)
     #Numbers that have not appeared in the past N games
     zeroArr = [i for i, x in enumerate(hotNumCount) if x == 0]
     zeroArr = [x+1 for x in zeroArr]
+    '''
     print "These numbers have not appeared in the past ", str(N) ," games: ", str(zeroArr)
     #Top 4 numbers that have appeared the most in the last N games
     test = sorted(range(len(hotNumCount)), key=lambda i: hotNumCount[i], reverse=True)[:4]
     print ("These are the top four numbers of the past " +
     str(N) + " games: " + str(test))
-
+    '''
+    return numCount
 #Analyze past data and see what would have been the
 #best single number as well as the best drawing period
 '''
@@ -252,7 +258,25 @@ def predictNumbers(textFile):
             print numList
     return textFile
 
-
+#Get overall data
+def scanAll():
+    massArr = [0]*80
+    fileCount = 0
+    for filename in os.listdir('kenoData'):
+        fileCount += 1
+        blankArr = []
+        fullPath = 'kenoData/' + filename
+        blankArr = numFreq(fullPath)
+        for i in range(0,80):
+            massArr[i] += blankArr[i]
+    print(len(massArr))
+    #Calculate percentage that numbers show up
+    #Assumes 300 draws a day
+    baseLine = 300*fileCount
+    print(baseLine)
+    for i in range (0,80):
+        print(str(round((massArr[i]/baseLine), 3)))
+    #print(massArr)
 
 #Functions to simulate past history to test validity of prediction methods
 #This assumes at least 150 games have already been played
