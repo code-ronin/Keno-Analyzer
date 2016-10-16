@@ -1,0 +1,25 @@
+Following some results, here are some patterns noticed:
+1. Every new draw of 20 numbers will usually not contain numbers from the previous draw. Don't choose numbers in last draw.
+2.
+
+
+----
+Tests to predict numbers, starting at draw 290
+
+7-12-2016
+UC: 16, 23, 36, 44, 45, 56
+Z: N/A
+Results: (2P: 16, 36), no 3P
+
+7-13-2016
+UC: 5, 23, 25, 58, 69, 74
+Z: 52
+Results(3P: 5, 23, 25)
+
+7-14-2016
+UC: 22, 27, 32, 38, 64, 78
+Z: 10, 27
+
+7-22-2016
+UC: 6, 23, 45, 49, 70, 80
+Z: 45, 55

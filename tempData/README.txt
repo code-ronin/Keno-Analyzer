@@ -1,0 +1,1 @@
+This directory is for data generated to guess the next possible winning numbers in Keno. This means that not all the days data is available in these data sets, and as such, they will be not be saved and deleted later

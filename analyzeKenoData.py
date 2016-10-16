@@ -4,63 +4,107 @@ import os
 from itertools import islice
 from collections import Counter
 import random
+import betCalculator
 
-#Calculate frequency of numbers currently on text file
-def numFreq(textFile):
+#Get frequency of numbers, skipping some and counting up to N
+def numFreq(textFile, skipN, N):
     #Grab numbers from text file
     numList = []
-    data = open(textFile, 'r')
+    with open(textFile) as f:
+        data = f.readlines()[skipN:]
     regex = re.compile(r'(\d{2})')
-    for line in data:
-        numbers = regex.findall(line)
+    for i in range(0,(N-skipN)):
+        numbers = regex.findall(data[i])
         for nums in numbers:
             numList.append(int(nums))
     #Get frequency of numbers for the list
     numCount = []
     for i in range(1, 81):
         numCount.append(numList.count(i))
-    #print(numCount)
-    #Total draws Currently:
-    '''
-    with open(textFile) as f:
-      print ("Total draws: " + str(len(f.readlines())))
-    #Hot numbers: Numbers that have not shown up frequently
-    print("Hottest Number: " + str(numCount.index(min(numCount))+1))
-    #Cold Numbers: Numbers that have appeared most often
-    print("Coldest Number: " + str(numCount.index(max(numCount))+1))
-    '''
-    #Numbers that have shown up in the last N games
-    N = 15  #Number of games that occur within an hour
-    with open(textFile) as f:
-        s = f.readlines()
-    s.reverse()
-    s = s[:N]
-    hotNumList = []
-    for i in range(0,N):
-        hotNums = regex.findall(s[i])
-        for nums in hotNums:
-            hotNumList.append(int(nums))
-    hotNumCount = []
-    for i in range(1, 81):
-        hotNumCount.append(hotNumList.count(i))
-    #print(hotNumCount)
-    #Numbers that have not appeared in the past N games
-    zeroArr = [i for i, x in enumerate(hotNumCount) if x == 0]
-    zeroArr = [x+1 for x in zeroArr]
-    '''
-    print "These numbers have not appeared in the past ", str(N) ," games: ", str(zeroArr)
-    #Top 4 numbers that have appeared the most in the last N games
-    test = sorted(range(len(hotNumCount)), key=lambda i: hotNumCount[i], reverse=True)[:4]
-    print ("These are the top four numbers of the past " +
-    str(N) + " games: " + str(test))
-    '''
+    #Return list of nums
     return numCount
-#Analyze past data and see what would have been the
-#best single number as well as the best drawing period
-'''
-To do this, you just need count all numbers for a certain
-grouping, and grab the maximum
-'''
+
+#Given input of numbers, check if full match
+def checkNums(textFile, skipN, maxDraws, numList):
+    #Read the next ten lines
+    with open(textFile) as f:
+        data = f.readlines()[skipN:]
+    regex = re.compile(r'(\d{2})')
+    for i in range(0,maxDraws):
+        numbers = regex.findall(data[i])
+        numbers = map(int, numbers)
+        matches = len(set(numbers).intersection(numList))
+        return betCalculator.matchPayout(len(numList), matches)
+
+
+#Get the least frequent numbers
+def leastFreq(numCount):
+    bot4 = sorted(range(len(numCount)), key=lambda i: numCount[i], reverse=True)[74:81]
+    #Add 1 to all top 4, as list starts count at 0, not 1
+    bot4 = [x+1 for x in bot4]
+    return sorted(bot4)
+
+#Get the most frequent numbers
+def mostFreq(numCount):
+    top4 = sorted(range(len(numCount)), key=lambda i: numCount[i], reverse=True)[:6]
+    #Add 1 to all top 4, as list starts count at 0, not 1
+    top4 = [x+1 for x in top4]
+    return sorted(top4)
+
+#Get numbers that have not appeared
+def zeroFreq(numCount):
+    zeroArr = [i for i, x in enumerate(numCount) if x == 0]
+    zeroArr = [x+1 for x in zeroArr]
+    return zeroArr
+
+#Get ratio of times number has shown up out of all possible chances
+def ratioCalc(numCount, zeroArr, chances):
+    ratioList =[]
+    for num in zeroArr:
+        numerator = numCount[num-1]
+        ratioList.append(round(numerator/chances, 4))
+    print(len(ratioList))
+    return ratioList
+
+#Find the longest combo that shows up the most
+def bestPattern(textFile, skipN, N):
+    #Return varaibles
+    bestChain = []
+    bestCount = 0
+    startLoc = 0
+    #Variables for holding best result
+    currChain = []
+    currCount = 0
+    testChain = []
+    with open(textFile) as f:
+        data = f.readlines()[skipN:]
+    regex = re.compile(r'(\d{2})')
+    #By default, set current combo as the first set of numbers
+    currChain = regex.findall(data[0])
+    for i in range(1,(N-skipN)):
+        testChain = regex.findall(data[i])
+        #Get the intersection of numbers
+        test = list(set(currChain).intersection(testChain))
+        #Combo is less than 3, begin reset
+        if(len(test) <= 2):
+            if(currCount >= bestCount):
+                bestChain = currChain
+                bestCount = currCount
+                startLoc = i
+            currChain = testChain
+            currCount = 0
+        else:
+            currChain = test
+            currCount+=1
+
+    #Return results
+    print("StartLoc: " + str(startLoc))
+    print("Chain count: " + str(bestCount))
+    print("Best Chain: " + str(sorted(bestChain)))
+    return bestChain
+
+
+#####
 def bestPick1(textFile):
     print("*********RUNNING-Pick1**************")
     skipN = 10    #Number of draws starting from 1 to skip
@@ -178,64 +222,7 @@ def bbestPickN(textFile, N):
     print("Avg. frequency of nums: " + str(reduce(lambda x, y: x + y, numCount) / len(numCount)))
     print("Won games: " + str(sorted(gameCount.items())))
     print("Best Nums are " + str(test))
-    '''
-    print("*********RUNNING-Pick2**************")
-    skipN = 10    #Number of draws starting from 1 to skip
-    N = 10     #Number od draws you are looking at after skip
-    tempList1 = []
-    tempList2 = []
-    currPick2 = []
-    tempPick = []
-    numCounter = {}
-    bestCount = 0
-    with open(textFile) as f:
-        data = f.readlines()[skipN:]
-    regex = re.compile(r'(\d{2})')
-    for i in range(0,N):
-        numList = []
-        numbers = regex.findall(data[i])
-        #Convert strings into nums First
-        for nums in numbers:
-            numList.append(int(nums))
-        #Populate test arrays
-        if not tempList1:
-            for nums in numList:
-                tempList1.append(nums)
-        elif not tempList2: #Populate list 2
-            print("*********Populating list 2...")
-            for nums in numList:
-                tempList2.append(nums)
-            print(tempList1)
-            print(tempList2)
-            currPick2 = [x for x in tempList1 if x in tempList2]
-            bestCount = 2
-            for nums in currPick2:
-                if nums in numCounter:
-                    numCounter[nums] += 1
-                else:
-                    numCounter[nums] = 1
-            print("First set is: " + str(currPick2))
-        else:
-            test = [x for x in currPick2 if x in numList]
-            for nums in currPick2:
-                if nums in numCounter:
-                    numCounter[nums] += 1
-                else:
-                    numCounter[nums] = 1
-            if not test:
-                print("No cookie here")
-            else:
-                print("additional nums: " + str(test))
-                bestCount += 1
 
-    print("Best count was " + str(bestCount))
-    print("numbers were " + str(currPick2))
-    '''
-
-
-
-
-    #Get biggest num
 
 
 #Predict the next four winning numbers using current data
@@ -259,24 +246,27 @@ def predictNumbers(textFile):
     return textFile
 
 #Get overall data
-def scanAll():
+def scanAll(testDir):
     massArr = [0]*80
     fileCount = 0
-    for filename in os.listdir('kenoData'):
+    for filename in os.listdir(testDir):
         fileCount += 1
         blankArr = []
-        fullPath = 'kenoData/' + filename
+        fullPath = testDir+ '/' + filename
         blankArr = numFreq(fullPath)
         for i in range(0,80):
             massArr[i] += blankArr[i]
-    print(len(massArr))
     #Calculate percentage that numbers show up
     #Assumes 300 draws a day
     baseLine = 300*fileCount
-    print(baseLine)
+    print(massArr)
+    return massArr
+
+    '''
     for i in range (0,80):
         print(str(round((massArr[i]/baseLine), 3)))
     #print(massArr)
+    '''
 
 #Functions to simulate past history to test validity of prediction methods
 #This assumes at least 150 games have already been played
